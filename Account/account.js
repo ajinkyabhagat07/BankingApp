@@ -11,10 +11,37 @@ class Account{
             if(typeof accountID != "number"){
                 throw new Error("accountid is invalid");
             }
-            let account = new Account(accountID , ++Account.accountNumber , 1000);
-            return account;
+            return new Account(accountID, ++Account.accountNumber, 1000);
+        
         } catch (error) {
-            
+            throw error;
+        }
+    }
+
+    getAccountNumber(){
+        return this.accountNumber;
+    }
+
+    depositeMoney(amount){
+        this.amount += amount;
+    }
+
+    getTotalBalance(){
+        return this.amount;
+    }
+
+    getAmount(){
+        return this.amount;
+    }
+
+    withdrawMoney(amount){
+        try {
+            if(this.amount < amount){
+                throw new Error("Insufficient funds")
+            }
+            this.amount -= amount;
+        } catch (error) {
+            throw error;
         }
     }
 

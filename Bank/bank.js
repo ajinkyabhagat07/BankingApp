@@ -1,3 +1,4 @@
+const { accountNumber } = require("../Account/account.js");
 const Person = require("../Person/person.js")
 
 class Bank{
@@ -13,7 +14,6 @@ class Bank{
     static createAccount(firstName , lastName , age){
 
         try {
-            console.log();
             let newPerson = Person.createAccount(++Bank.personID, firstName, lastName, age);
             Bank.persons.push(newPerson);  
             return new Bank(newPerson);
@@ -24,22 +24,59 @@ class Bank{
 
     }
 
-    getPerson(id){
-        for(let i=0; i<Bank.persons.length; i++){
-            if(Bank.persons[i].getPerson() == id){
-                return Bank.persons[i];
-            }
-        }
-    }
+    
 
     createAnotherAccount(){
         try {
-            let cuurentPerson = this.getPerson(this.id);
-            cuurentPerson.createAnotherAccount();
+            this.person.createAnotherAccount();
         } catch (error) {
             console.log(error);
         }
     }
+
+    deposite(accountNumber , amount){
+        try {
+            this.person.depositeMoney(accountNumber ,  amount);
+            console.log(amount , "deposited successfully in" , accountNumber );
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    getTotalBalanceAllAccount(){
+        try {
+           return this.person.getTotalBalanceAllAccount(); 
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    getTotalBalance(accountNumber){
+        try {
+            return this.person.getTotalBalance(accountNumber);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    withdraw(accountNumber , amount){
+        try {
+            this.person.withdrawMoney(accountNumber , amount);
+            console.log(amount , "withdrawl succesfull from" , accountNumber);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    tranferMoney(sourceAccountNumber, targetAccountNumber, amount){
+        try {
+            this.person.tranferMoney(sourceAccountNumber, targetAccountNumber, amount);
+            console.log(`Transferred Rs.${amount} from account ${sourceAccountNumber} to account ${targetAccountNumber}.`);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    
 }
 
 module.exports = Bank;

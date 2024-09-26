@@ -3,6 +3,7 @@ const Account = require("../Account/account.js");
 class Person{
 
     static accountID = 0;
+    static Allaccounts = [];
 
     constructor(personID , personName , age , accounts ){
         this.personID = personID;
@@ -35,6 +36,7 @@ class Person{
             let accounts = [];
             let newAccount = Account.newAccount(++Person.accountID);
             accounts.push(newAccount);
+            Person.Allaccounts.push(newAccount);
             return new Person(personID , fullName , age , accounts)
 
 
@@ -54,6 +56,77 @@ class Person{
 
     getPerson(){
         return this.personID;
+    }
+
+    findAccount(accountNumber){
+       
+        for(let i=0; i<Person.accountID; i++){
+            if(Person.Allaccounts[i].getAccountNumber() == accountNumber){
+                return Person.Allaccounts[i];
+            }
+        }
+
+        return null;
+    }
+
+    depositeMoney(accountNumber,amount){
+        try {
+            let getAccount = this.findAccount(accountNumber);
+            
+            getAccount.depositeMoney(amount);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    getTotalBalance(accountNumber){
+        try {
+            let getAccount = this.findAccount(accountNumber);
+            let balance = getAccount.getTotalBalance();
+            return balance;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    getTotalBalanceAllAccount(){
+        try {
+            let total = 0;
+            for(let i=0; i<this.accounts.length; i++){
+                total += this.accounts[i].getAmount();
+            }
+            return total;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    withdrawMoney(accountNumber , amount){
+        try {
+            let reqAccount = this.findAccount(accountNumber);
+            reqAccount.withdrawMoney(amount);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    tranferMoney(sourceAccountNumber, targetAccountNumber, amount){
+        try {
+            let sourceAccount = this.findAccount(sourceAccountNumber);
+            let targetAccount = this.findAccount(targetAccountNumber);
+            console.log(sourceAccount);
+            if (!sourceAccount) {
+                throw new Error(`Source account ${sourceAccountNumber} not found.`);
+            }
+            if (!targetAccount) {
+                throw new Error(`Target account ${targetAccountNumber} not found.`);
+            }
+
+            sourceAccount.withdrawMoney(amount);
+            targetAccount.depositeMoney(amount);
+        } catch (error) {
+            throw error;
+        }
     }
 
 }
