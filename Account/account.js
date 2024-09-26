@@ -18,12 +18,29 @@ class Account{
         }
     }
 
+    static validateAccountNumber(accountNumber){
+        try {
+            if(typeof accountNumber != "number"){
+                throw new Error("account numbetr is invalid")
+            }
+        } catch (error) {
+            throw error;
+        }
+    }
+
     getAccountNumber(){
         return this.accountNumber;
     }
 
     depositeMoney(amount){
+       try {
+        if(typeof amount != "number"){
+            throw new Error("amount is invalid");
+        }
         this.amount += amount;
+       } catch (error) {
+         throw error;
+       }
     }
 
     getTotalBalance(){

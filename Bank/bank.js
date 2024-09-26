@@ -52,6 +52,7 @@ class Bank{
 
     getTotalBalance(accountNumber){
         try {
+           
             return this.person.getTotalBalance(accountNumber);
         } catch (error) {
             console.log(error);
@@ -60,6 +61,7 @@ class Bank{
 
     withdraw(accountNumber , amount){
         try {
+            
             this.person.withdrawMoney(accountNumber , amount);
             console.log(amount , "withdrawl succesfull from" , accountNumber);
         } catch (error) {
@@ -69,8 +71,9 @@ class Bank{
 
     tranferMoney(sourceAccountNumber, targetAccountNumber, amount){
         try {
+            
             this.person.tranferMoney(sourceAccountNumber, targetAccountNumber, amount);
-            console.log(`Transferred Rs.${amount} from account ${sourceAccountNumber} to account ${targetAccountNumber}.`);
+            console.log(`Transferred ${amount} from account ${sourceAccountNumber} to account ${targetAccountNumber}.`);
         } catch (error) {
             console.log(error);
         }

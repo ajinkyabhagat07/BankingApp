@@ -60,17 +60,25 @@ class Person{
 
     findAccount(accountNumber){
        
-        for(let i=0; i<Person.accountID; i++){
-            if(Person.Allaccounts[i].getAccountNumber() == accountNumber){
-                return Person.Allaccounts[i];
+        try {
+           
+            for(let i=0; i<Person.accountID; i++){
+                if(Person.Allaccounts[i].getAccountNumber() == accountNumber){
+                    return Person.Allaccounts[i];
+                }
             }
+    
+            return null;
+            
+        } catch (error) {
+            throw error;
         }
-
-        return null;
     }
 
     depositeMoney(accountNumber,amount){
         try {
+            Account.validateAccountNumber(accountNumber);
+            
             let getAccount = this.findAccount(accountNumber);
             
             getAccount.depositeMoney(amount);
@@ -81,6 +89,8 @@ class Person{
 
     getTotalBalance(accountNumber){
         try {
+            Account.validateAccountNumber(accountNumber);
+
             let getAccount = this.findAccount(accountNumber);
             let balance = getAccount.getTotalBalance();
             return balance;
@@ -103,6 +113,7 @@ class Person{
 
     withdrawMoney(accountNumber , amount){
         try {
+            Account.validateAccountNumber(accountNumber);
             let reqAccount = this.findAccount(accountNumber);
             reqAccount.withdrawMoney(amount);
         } catch (error) {
@@ -112,9 +123,11 @@ class Person{
 
     tranferMoney(sourceAccountNumber, targetAccountNumber, amount){
         try {
+            Account.validateAccountNumber(sourceAccountNumber);
+            Account.validateAccountNumber(targetAccountNumber);
             let sourceAccount = this.findAccount(sourceAccountNumber);
             let targetAccount = this.findAccount(targetAccountNumber);
-            console.log(sourceAccount);
+           
             if (!sourceAccount) {
                 throw new Error(`Source account ${sourceAccountNumber} not found.`);
             }
