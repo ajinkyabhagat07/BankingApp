@@ -1,85 +1,49 @@
-const { accountNumber } = require("../Account/account.js");
-const Person = require("../Person/person.js")
-
 class Bank{
-
-    static personID = 0;
-    static persons = [];
-
-    constructor(person){
-        this.person = person;
+    static bank_id = 0;
+    static AllBanks = [];
+    constructor(bank_id , bankName ,abbreviation ,  accounts){
+        this.bank_id = bank_id;
+        this.bankName = bankName;
+        this.abbreviation = abbreviation;
+        this.accounts = accounts;
     }
 
-
-    static createAccount(firstName , lastName , age){
-
-        try {
-            let newPerson = Person.createAccount(++Bank.personID, firstName, lastName, age);
-            Bank.persons.push(newPerson);  
-            return new Bank(newPerson);
-        } catch (error) {
-            console.log(error);
+    static createBank(bankName , abbreviation){
+       try {
+        if(typeof bankName != "string"){
+            throw new Error("BANK NAME IS INVALID")
         }
 
-
-    }
-
-    
-
-    createAnotherAccount(){
-        try {
-            this.person.createAnotherAccount();
-        } catch (error) {
-            console.log(error);
+        if(typeof abbreviation != "string"){
+            throw new Error("abbrevation is invalid")
         }
+
+        let newBank = new Bank(++Bank.bank_id , bankName , abbreviation , []);
+        Bank.AllBanks.push(newBank);
+        return newBank;
+        
+       } catch (error) {
+         throw error;
+       }
     }
 
-    deposite(accountNumber , amount){
-        try {
-            this.person.depositeMoney(accountNumber ,  amount);
-            console.log(amount , "deposited successfully in" , accountNumber );
-        } catch (error) {
-            console.log(error);
-        }
+    getBankName(){
+        return this.abbreviation;
     }
-    getTotalBalanceAllAccount(){
+
+    static getBankById(id){
         try {
-           return this.person.getTotalBalanceAllAccount(); 
+            
+            for(let i=0; i<Bank.AllBanks.length; i++){
+                if(Bank.AllBanks[i].bank_id == id){
+                    return Bank.AllBanks[i];
+                }
+            }
         } catch (error) {
             throw error;
         }
     }
 
-    getTotalBalance(accountNumber){
-        try {
-           
-            return this.person.getTotalBalance(accountNumber);
-        } catch (error) {
-            console.log(error);
-        }
-    }
-
-    withdraw(accountNumber , amount){
-        try {
-            
-            this.person.withdrawMoney(accountNumber , amount);
-            console.log(amount , "withdrawl succesfull from" , accountNumber);
-        } catch (error) {
-            console.log(error);
-        }
-    }
-
-    tranferMoney(sourceAccountNumber, targetAccountNumber, amount){
-        try {
-            
-            this.person.tranferMoney(sourceAccountNumber, targetAccountNumber, amount);
-            console.log(`Transferred ${amount} from account ${sourceAccountNumber} to account ${targetAccountNumber}.`);
-        } catch (error) {
-            console.log(error);
-        }
-    }
-
-    
 }
 
 module.exports = Bank;

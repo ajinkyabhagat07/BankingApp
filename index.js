@@ -1,29 +1,18 @@
-const Bank = require("./Bank/bank.js");
+const Customer = require("./Customer/customer.js");
 
-let cust1 = Bank.createAccount("Ajinkya" , "bhagat" , 22);
-
-
-let cust2 = Bank.createAccount("Avi" , "bhagat" , 21);
+let Admin = Customer.createAdminAccount("Ajinkya" , "bhagat" , 23 , "male");
 
 
-// cust1.deposite(1001 , 1000);
-// cust1.getTotalBalance(1001);
+const sbi = Admin.createBank("state bank of india" , "SBI");
 
-// cust1.createAnotherAccount();
+const cbi = Admin.createBank("central Bank of india" , "CBI");
 
-console.log(JSON.stringify(cust1 , null , 2));
-console.log(JSON.stringify(cust2 , null , 2));
+let cust1 = Admin.createCustomer("SBI" , "Avi" , "bhagat" , 21 , "male");
 
-// // console.log(cust1.getTotalBalance(1001));
-
-// console.log(cust1.getTotalBalanceAllAccount());
-
-// cust1.withdraw(1001 , 100);
+Admin.creteAnotherAccount(2 , "CBI");
+Admin.creteAnotherAccount(2 , "CBI")
 
 
-cust1.tranferMoney(1001 , 1002 , 100);
+cust1.transferMoney(1001 , 1003 , 800);
 
-// console.log(cust2.getTotalBalanceAllAccount());
-
-console.log(cust1.getTotalBalance(1001));
-
+console.log(cust1);
