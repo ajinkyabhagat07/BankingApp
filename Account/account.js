@@ -6,12 +6,14 @@ class Account{
 
     static accountNumber = 1000;
     static accountID = 0;
-    constructor(accountID , customer_id,bankName, accountNumber , amount){
+    constructor(accountID , customer_id,bankName, accountNumber , amount , passbook , isActive){
         this.accountID = accountID;
         this.customer_id = customer_id;
         this.bankName = bankName;
         this.accountNumber = accountNumber;
         this.amount = amount;
+        this.passbook = passbook;
+        this.isActive = isActive;
     }
 
     static newAccount(customer_id , bankName){
@@ -21,8 +23,10 @@ class Account{
             }
            
             let bank = Account.findBankByName(bankName);
-            let newAccount =  new Account(++Account.accountID,customer_id , bankName, ++Account.accountNumber ,1000);
+            let newAccount =  new Account(++Account.accountID,customer_id , bankName, ++Account.accountNumber ,1000 , [] , true);
             bank.accounts.push(newAccount);
+            let newEntry = Passbook.addDetailsToPassBook('deposit', 1000, newAccount.amount);
+            newAccount.passbook.push(newEntry);
             return newAccount;
         
         } catch (error) {
@@ -33,7 +37,7 @@ class Account{
     static findBankByName(bankName){
         try {
             for(let i=0; i<Bank.AllBanks.length; i++){
-                if(Bank.AllBanks[i].getBankName() === bankName){
+                if(Bank.AllBanks[i].getBankName() === bankName && Bank.AllBanks[i].isActive){
                     return Bank.AllBanks[i];
                 }
             }
@@ -61,8 +65,19 @@ class Account{
             throw error;
         }
     }
+
+    static updateBankById(id , parameter , value){
+        try {
+            Bank.updateBankById(id , parameter , value);
+        } catch (error) {
+            throw error;
+        }
+    }
     getBalance(){
         try {
+            if(!this.isActive){
+                throw new Error("account is inactive")
+            }
             return this.amount;
         } catch (error) {
             throw error;
@@ -73,12 +88,33 @@ class Account{
         return this.accountNumber;
     }
 
+    deleteAccount(){
+        try {
+           this.isActive = false; 
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    static deleteBank(bankID){
+        try {
+            Bank.deleteBank(bankID);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+   
+
+
     depositeMoney(amount){
         try {
             if(typeof amount != "number"){
                 throw new Error("amount is invalid")
             }
             this.amount += amount; 
+            let newEntry = Passbook.addDetailsToPassBook('deposit', amount, this.amount);
+            this.passbook.push(newEntry);
         } catch (error) {
             throw error;
         }
@@ -100,7 +136,12 @@ class Account{
                 if(typeof amount != "number"){
                     throw new Error("amount is invalid")
                 }
+                if(this.amount < amount){
+                    throw new Error("Insufficient funds");
+                }
                 this.amount -= amount; 
+                let newEntry = Passbook.addDetailsToPassBook('withdraw', amount, this.amount);
+                this.passbook.push(newEntry);
             } catch (error) {
                 throw error;
             }
@@ -109,57 +150,33 @@ class Account{
         }
     }
 
+    transferMoney(targetAccount ,amount){
+        try {
+            if(this.amount < amount){
+                throw new Error("Insufficient funds");
+            }
+            this.amount -= amount;
+            targetAccount.amount += amount;
+            let sourceBank = Bank.getBankByBankName(this.bankName);
+            let targetBank = Bank.getBankByBankName(targetAccount.bankName);
+            sourceBank.updateLedger(targetBank.abbreviation, -amount);
+            targetBank.updateLedger(sourceBank.abbreviation, amount);
+            let newEntrySourceAccount = Passbook.addDetailsToPassBook(`Transferred  to Account ${targetAccount.accountNumber}` , amount , this.amount);
+            let newEntryTargetAccount = Passbook.addDetailsToPassBook(`Received from Account ${this.accountNumber}`, amount, targetAccount.amount);
+            this.passbook.push(newEntrySourceAccount);
+            targetAccount.passbook.push(newEntryTargetAccount);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    getPassBook(){
+        return this.passbook;
+    }
+
     
 
-    // static validateAccountNumber(accountNumber){
-    //     try {
-    //         if(typeof accountNumber != "number"){
-    //             throw new Error("account numbetr is invalid")
-    //         }
-    //     } catch (error) {
-    //         throw error;
-    //     }
-    // }
-
-
-    // getAccountNumber(){
-    //     return this.accountNumber;
-    // }
-
-    // depositeMoney(amount){
-    //    try {
-    //     if(typeof amount != "number"){
-    //         throw new Error("amount is invalid");
-    //     }
-    //     this.amount += amount;
-    //     let reqEntry = Passbook.addDetailsToPassBook("deposite" , amount , this.amount);
-    //     this.passbook.push(reqEntry);
-        
-    //    } catch (error) {
-    //      throw error;
-    //    }
-    // }
-
-    // getTotalBalance(){
-    //     return this.amount;
-    // }
-
-    // getAmount(){
-    //     return this.amount;
-    // }
-
-    // withdrawMoney(amount){
-    //     try {
-    //         if(this.amount < amount){
-    //             throw new Error("Insufficient funds")
-    //         }
-    //         this.amount -= amount;
-    //         let reqEntry = Passbook.addDetailsToPassBook("withdraw" , amount , this.amount);
-    //         this.passbook.push(reqEntry);
-    //     } catch (error) {
-    //         throw error;
-    //     }
-    // }
+    
 
 }
 
