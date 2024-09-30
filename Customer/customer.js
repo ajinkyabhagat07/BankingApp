@@ -1,12 +1,12 @@
 const Account = require("../Account/account.js")
 
 class Customer{
-    static customer_id = 0;
+    static customerId = 0;
     static Allusers = [];
     static AllAdmins = [];
 
-    constructor(customer_id , firstName , lastName , fullName , age , gender , isAdmin, accounts , isActive){
-        this.customer_id = customer_id;
+    constructor(customerId , firstName , lastName , fullName , age , gender , isAdmin, accounts , isActive){
+        this.customerId = customerId;
         this.firstName = firstName;
         this.lastName = lastName;
         this.fullName = fullName;
@@ -38,7 +38,7 @@ class Customer{
     
             let fullName = firstName + " " + lastName;
 
-            let newAdmin = new Customer(++Customer.customer_id ,firstName , lastName, fullName , age , gender, true , [] , true);
+            let newAdmin = new Customer(++Customer.customerId ,firstName , lastName, fullName , age , gender, true , [] , true);
 
             Customer.AllAdmins.push(newAdmin);
 
@@ -84,16 +84,16 @@ class Customer{
 
             let fullName = firstName + " " + lastName;
 
-            let customer_id = ++Customer.customer_id;
+            let customerId = ++Customer.customerId;
 
-            let newAccount = Account.newAccount(customer_id , bankName);
+            let newAccount = Account.newAccount(customerId , bankName);
 
             let accounts = [];
 
             accounts.push(newAccount);
 
 
-            let newCustomer = new Customer(customer_id ,firstName , lastName, fullName , age , gender  , false , accounts , true);
+            let newCustomer = new Customer(customerId ,firstName , lastName, fullName , age , gender  , false , accounts , true);
 
             Customer.Allusers.push(newCustomer);
 
@@ -106,21 +106,17 @@ class Customer{
     }
 
     //create another accounr
-    creteAnotherAccount(customer_id , bankName){
+    createAnotherAccount(bankName){
         try {
-            if(!this.isAdmin){
-                throw new Error("only admin can create customers")
-            }
-            if(typeof customer_id != "number"){
+            
+            if(typeof this.customerId != "number"){
                 throw new Error("customer id is invalid.")
             }
-            if(!this.isAdmin){
-                throw new Error("customer cannot create account")
+            if(!this.isActive){
+                throw new Error("customer is inactive")
             }
-            let reqCustomer = Customer.getCustomerById(customer_id);
-            
-            let newAccount = Account.newAccount(customer_id , bankName);
-            reqCustomer.accounts.push(newAccount);
+            let newAccount = Account.newAccount(this.customerId , bankName);
+            this.accounts.push(newAccount);
         } catch (error) {
             console.log(error);
         }
@@ -130,7 +126,7 @@ class Customer{
     static getCustomerById(id){
         try {
            for(let i=0; i<Customer.Allusers.length; i++){
-              if(Customer.Allusers[i].customer_id == id){
+              if(Customer.Allusers[i].customerId == id){
                 return Customer.Allusers[i];
               }
               return null;
@@ -151,18 +147,18 @@ class Customer{
         }
     }
 
-    updateUserById(customer_id , parameterToUpdate , value){
+    updateUserById(customerId , parameterToUpdate , value){
         try {
             if(!this.isAdmin){
                 throw new Error("only admin can update customers")
             }
-            if(typeof customer_id != "number"){
+            if(typeof customerId != "number"){
                 throw new Error("id is invalid");
             }
             if(typeof parameterToUpdate != "string"){
                 throw new Error("parameter is invalid")
             }
-            let reqCustomer = Customer.getCustomerById(customer_id);
+            let reqCustomer = Customer.getCustomerById(customerId);
     
             switch(parameterToUpdate){
                 case "firstName":
@@ -223,12 +219,12 @@ class Customer{
         }
     }
 
-    deleteAccountByAccountNumber(customer_id , accountNumber){
+    deleteAccountByAccountNumber(customerId, accountNumber){
         try {
             if(!this.isAdmin){
                 throw new Error("only admin can delete account")
             }
-            let reqCustomer = Customer.getCustomerById(customer_id);
+            let reqCustomer = Customer.getCustomerById(customerId);
             let reqAccountNumber = reqCustomer.getAccountByAccountNumber(accountNumber);
             reqAccountNumber.deleteAccount();
 
@@ -266,7 +262,7 @@ class Customer{
             if(!this.isAdmin){
                 throw new Error("only admin can delete customers")
             }
-            let reqCustomer = Customer.getCustomerById(customer_id);
+            let reqCustomer = Customer.getCustomerById(customerId);
             //console.log(reqCustomer);
             if(reqCustomer.isActiveAccounts()){
                 throw new Error("Customer contains active accounts , cant delete it ..")
@@ -283,7 +279,7 @@ class Customer{
             if(!this.isActive){
                 throw new Error("customer is not active")
             }
-            let reqCustomer = this.getCustomerById(this.customer_id);
+            let reqCustomer = this.getCustomerById(this.customerId);
             let totalBalance = 0;
             
             for(let i=0; i<reqCustomer.accounts.length; i++){
@@ -298,7 +294,7 @@ class Customer{
     getAccountByAccountNumber(accountNumber){
         try {
             Account.validateAccountNumber(accountNumber);
-            let reqCustomer = Customer.getCustomerById(this.customer_id);
+            let reqCustomer = Customer.getCustomerById(this.customerId);
             for(let i=0; i<reqCustomer.accounts.length; i++){
                 if(reqCustomer.accounts[i].getAccoutNumber() === accountNumber && reqCustomer.accounts[i].isActive){
                     return reqCustomer.accounts[i];
@@ -385,8 +381,8 @@ class Customer{
             Account.validateAccountNumber(accountNumber);
             let reqCustomer = null;
             
-            for(let i=0; i<Customer.customer_id; i++){
-                if(Customer.Allusers[i].customer_id == id){
+            for(let i=0; i<Customer.customerId; i++){
+                if(Customer.Allusers[i].customerId == id){
                     reqCustomer =  Customer.Allusers[i];
                     break;
                 }
@@ -408,6 +404,14 @@ class Customer{
             }
             
             return reqAccount.getPassBook();
+        } catch (error) {
+           console.log(error); 
+        }
+    }
+
+    getLedger(bankName){
+        try {
+            return Account.getLedger(bankName);
         } catch (error) {
            console.log(error); 
         }

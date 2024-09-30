@@ -6,9 +6,9 @@ class Account{
 
     static accountNumber = 1000;
     static accountID = 0;
-    constructor(accountID , customer_id,bankName, accountNumber , amount , passbook , isActive){
+    constructor(accountID , customerId,bankName, accountNumber , amount , passbook , isActive){
         this.accountID = accountID;
-        this.customer_id = customer_id;
+        this.customerId = customerId;
         this.bankName = bankName;
         this.accountNumber = accountNumber;
         this.amount = amount;
@@ -16,14 +16,14 @@ class Account{
         this.isActive = isActive;
     }
 
-    static newAccount(customer_id , bankName){
+    static newAccount(customerId , bankName){
         try {
             if(typeof bankName != "string"){
                 throw new Error("bank is invalid");
             }
            
             let bank = Account.findBankByName(bankName);
-            let newAccount =  new Account(++Account.accountID,customer_id , bankName, ++Account.accountNumber ,1000 , [] , true);
+            let newAccount =  new Account(++Account.accountID,customerId , bankName, ++Account.accountNumber ,1000 , [] , true);
             bank.accounts.push(newAccount);
             let newEntry = Passbook.addDetailsToPassBook('deposit', 1000, newAccount.amount);
             newAccount.passbook.push(newEntry);
@@ -152,26 +152,43 @@ class Account{
 
     transferMoney(targetAccount ,amount){
         try {
+
             if(this.amount < amount){
                 throw new Error("Insufficient funds");
             }
+
+            let originalSourceAmount = this.amount;
+            let originalTargetAmount = targetAccount.amount;
+
             this.amount -= amount;
             targetAccount.amount += amount;
             let sourceBank = Bank.getBankByBankName(this.bankName);
             let targetBank = Bank.getBankByBankName(targetAccount.bankName);
-            sourceBank.updateLedger(targetBank.abbreviation, -amount);
-            targetBank.updateLedger(sourceBank.abbreviation, amount);
+            sourceBank.updateLedger(targetBank.bankId, targetBank.bankName , targetBank.abbreviation, -amount);
+            targetBank.updateLedger(sourceBank.bankId , sourceBank.bankName ,sourceBank.abbreviation, amount);
             let newEntrySourceAccount = Passbook.addDetailsToPassBook(`Transferred  to Account ${targetAccount.accountNumber}` , amount , this.amount);
             let newEntryTargetAccount = Passbook.addDetailsToPassBook(`Received from Account ${this.accountNumber}`, amount, targetAccount.amount);
             this.passbook.push(newEntrySourceAccount);
             targetAccount.passbook.push(newEntryTargetAccount);
         } catch (error) {
+            //rollback transaction
+            this.amount = originalSourceAmount;
+            targetAccount.amount = originalTargetAmount;
             throw error;
         }
     }
 
     getPassBook(){
         return this.passbook;
+    }
+
+    static getLedger(bankName){
+        try {
+            let foundBank = this.findBankByName(bankName);
+            return foundBank.getLedger();
+        } catch (error) {
+            throw error;
+        }
     }
 
     

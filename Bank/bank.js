@@ -1,8 +1,10 @@
+const Ledger = require("../BankLedger/ledger")
+
 class Bank{
-    static bank_id = 0;
+    static bankId = 0;
     static AllBanks = [];
-    constructor(bank_id , bankName ,abbreviation ,  accounts , isActive , ledger){
-        this.bank_id = bank_id;
+    constructor(bankId , bankName ,abbreviation ,  accounts , isActive , ledger){
+        this.bankId =bankId;
         this.bankName = bankName;
         this.abbreviation = abbreviation;
         this.accounts = accounts;
@@ -20,7 +22,7 @@ class Bank{
             throw new Error("abbrevation is invalid")
         }
 
-        let newBank = new Bank(++Bank.bank_id , bankName , abbreviation , [] , true , []);
+        let newBank = new Bank(++Bank.bankId , bankName , abbreviation , [] , true , []);
         Bank.AllBanks.push(newBank);
         return newBank;
         
@@ -56,7 +58,7 @@ class Bank{
         try {
             
             for(let i=0; i<Bank.AllBanks.length; i++){
-                if(Bank.AllBanks[i].bank_id == id && Bank.AllBanks[i].isActive){
+                if(Bank.AllBanks[i].bankId == id && Bank.AllBanks[i].isActive){
                     return Bank.AllBanks[i];
                 }
             }
@@ -141,15 +143,32 @@ class Bank{
         }
     }
 
-    updateLedger(otherBankAbbreviation, amount){
-       try {
-        if (!this.ledger[otherBankAbbreviation]) {
-            this.ledger[otherBankAbbreviation] = 0; 
+    updateLedger(bankID , bankName , otherBankAbbreviation, amount){
+        try {
+            let found = false;
+           
+            for (let i = 0; i < this.ledger.length; i++) {
+                if (this.ledger[i].bankID === bankID) {
+                    this.ledger[i].netAmount += amount;
+                    found = true;
+                    break;
+                }
+            }
+
+    
+            if (!found) {
+                let newEntry = Ledger.newLedgerEntry(bankID, bankName, otherBankAbbreviation);
+                newEntry.netAmount = amount;
+                this.ledger.push(newEntry);
+            }
+
+        } catch (error) {
+            throw error;
         }
-        this.ledger[otherBankAbbreviation] += amount;
-       } catch (error) {
-        throw error;
-       }
+    }
+
+    getLedger(){
+        return this.ledger;
     }
 
 }
