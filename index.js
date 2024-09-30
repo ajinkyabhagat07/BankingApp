@@ -9,9 +9,12 @@ const cbi = Admin.createBank("central Bank of india" , "CBI");
 
 let cust1 = Admin.createCustomer("SBI" , "Avi" , "bhagat" , 21 , "male");
 
-Admin.creteAnotherAccount(2 , "SBI");
+Admin.creteAnotherAccount(2 , "CBI");
 
 
 
 
 cust1.transferMoney(1001 , 1002 , 200);
+cust1.transferMoney(1002 , 1001 , 500);
+
+console.log(Admin.getBankById(1));

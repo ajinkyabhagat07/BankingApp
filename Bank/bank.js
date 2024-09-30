@@ -142,7 +142,14 @@ class Bank{
     }
 
     updateLedger(otherBankAbbreviation, amount){
-        
+       try {
+        if (!this.ledger[otherBankAbbreviation]) {
+            this.ledger[otherBankAbbreviation] = 0; 
+        }
+        this.ledger[otherBankAbbreviation] += amount;
+       } catch (error) {
+        throw error;
+       }
     }
 
 }
